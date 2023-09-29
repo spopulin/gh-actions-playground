@@ -30,6 +30,9 @@ jobs:
       - name: echo var only staging
         run: echo ${{ vars.STG_VALUE }}
 
+      - name: secret only staging
+        run: echo ${{ secrets.STG_SECRET }}
+
       - name: echo var set in env
         run: echo $ENV_VAR
         env:
