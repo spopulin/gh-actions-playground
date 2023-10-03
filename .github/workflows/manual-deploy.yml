@@ -7,6 +7,14 @@ on:
         description: "Environment to deploy to"
         type: environment
         required: true
+      service:
+        type: choice
+        description: serverless service to deploy
+        options: 
+          - users
+          - admin-users
+          - workshops
+          - demos
 
 jobs:
   deploy:
