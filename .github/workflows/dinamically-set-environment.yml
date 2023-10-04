@@ -6,6 +6,8 @@ on:
       - main
       - staging
       - prod
+  workflow_dispatch: # manual trigger
+
 env:
   STAGE: ${{ github.ref_name == 'main' && 'dev' || github.ref_name }}
 
@@ -13,7 +15,7 @@ jobs:
   deploy:
     name: deploy
     runs-on: ubuntu-latest
-    environment: ${{ env.STAGE }}
+    environment: ${{ github.ref_name == 'main' && 'dev' || github.ref_name }}
     strategy:
       matrix:
         node-version: [16.x]
@@ -25,7 +27,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      
+
       - name: echo stage
         run: echo $STAGE
 
