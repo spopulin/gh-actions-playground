@@ -29,6 +29,8 @@ jobs:
         run: echo ${{ matrix.service }}
       - name: echo environment name
         run: echo ${{ env.ENV_NAME }}
+      - name: echo branch name
+        run: echo ${{ github.ref_name }}
 
   deploy-second-phase:
     name: ${{ matrix.service }} deploy
@@ -48,6 +50,8 @@ jobs:
         run: echo ${{ matrix.service }}
       - name: echo environment name
         run: echo ${{ env.ENV_NAME }}
+      - name: echo branch name
+        run: echo ${{ github.ref_name }}
 
   post-deploy:
     name: post-deploy
@@ -62,3 +66,5 @@ jobs:
         run: echo $DEPLOY_STAGE
       - name: echo environment name
         run: echo ${{ env.ENV_NAME }}
+      - name: echo branch name
+        run: echo ${{ github.ref_name }}
