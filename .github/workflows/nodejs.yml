@@ -15,7 +15,7 @@ jobs:
       matrix:
         node-version: [16.15.0]
     env:
-      NODE_OPTIONS: "--max_old_space_size=4096"
+      NODE_OPTIONS: "--max_old_space_size=6144"
     steps:
       - name: checkout
         uses: actions/checkout@v3
@@ -23,8 +23,11 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - name: total memory size
-        run: node -e 'require('os').totalmem() / (1024*1024)'
+      - name: Show system information
+        run: |
+          free -m
+      - name: Execute free-mem script
+        run: node getSystemInfo.js
       - name: heap size
         run: node -e 'console.log(v8.getHeapStatistics().heap_size_limit/(1024*1024))'
       - name: node options
