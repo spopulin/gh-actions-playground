@@ -1,0 +1,64 @@
+name: deploy all services
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+      - prod
+  workflow_dispatch: # manual trigger
+
+env:
+  DEPLOY_STAGE: ${{ github.ref_name == 'main' && 'dev' || github.ref_name }}
+  ENV_NAME: ${{ github.ref_name == 'main' && 'dev' || github.ref_name }}
+
+jobs:
+  deploy-first-phase:
+    name: Deploy First Phase
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'main' && 'dev' || github.ref_name }}
+    strategy:
+      matrix:
+        node-version: [16.15.0]
+        service:
+          - "service-base-1"
+          - "service-base-2"
+          - "service-base-3"
+    steps:
+      - name: echo service name
+        run: echo ${{ matrix.service }}
+      - name: echo environment name
+        run: echo ${{ env.ENV_NAME }}
+
+  deploy-second-phase:
+    name: Deploy Second Phase
+    needs: deploy-first-phase
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'main' && 'dev' || github.ref_name }}
+    strategy:
+      matrix:
+        node-version: [16.15.0]
+        service:
+          - "service-one"
+          - "service-two"
+          - "service-three"
+          - "service-four"
+    steps:
+      - name: echo service name
+        run: echo ${{ matrix.service }}
+      - name: echo environment name
+        run: echo ${{ env.ENV_NAME }}
+
+  post-deploy:
+    name: post-deploy
+    needs: [deploy-first-phase, deploy-second-phase]
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'main' && 'dev' || github.ref_name }}
+    strategy:
+      matrix:
+        node-version: [16.15.0]
+    steps:
+      - name: echo deploy stage
+        run: echo $DEPLOY_STAGE
+      - name: echo environment name
+        run: echo ${{ env.ENV_NAME }}
