@@ -27,7 +27,7 @@ jobs:
         run: |
           free -m
       - name: Execute free-mem script
-        run: node getSystemInfo.js
+        run: node scripts/free-mem.js
       - name: heap size
         run: node -e 'console.log(v8.getHeapStatistics().heap_size_limit/(1024*1024))'
       - name: node options
