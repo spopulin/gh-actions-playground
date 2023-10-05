@@ -14,7 +14,7 @@ env:
 
 jobs:
   deploy-first-phase:
-    name: Deploy First Phase
+    name: ${{ matrix.service }} deploy
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'dev' || github.ref_name }}
     strategy:
@@ -31,7 +31,7 @@ jobs:
         run: echo ${{ env.ENV_NAME }}
 
   deploy-second-phase:
-    name: Deploy Second Phase
+    name: ${{ matrix.service }} deploy
     needs: deploy-first-phase
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name == 'main' && 'dev' || github.ref_name }}
