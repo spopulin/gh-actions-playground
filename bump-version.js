@@ -9,6 +9,7 @@ async function runBumpVersion() {
 if (require.main === module) {
   try {
     runBumpVersion();
+    console.log("IS GITHUB ACTIONS?", process.env.GITHUB_ACTIONS);
   } catch (e) {
     console.error("Bump version failed", e);
     exit(1);
