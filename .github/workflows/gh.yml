@@ -5,10 +5,12 @@ on:
     branches:
       - test-gh
 
+permissions:
+  contents: write
+
 jobs:
   update_workflow:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
