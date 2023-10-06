@@ -1,0 +1,21 @@
+{
+  "name": "gh-actions-playground",
+  "version": "1.0.0",
+  "description": "Public repository created to test github actions features (for free 😛)",
+  "main": "bump-version.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spopulin/gh-actions-playground.git",
+    "post-deploy": "node ./dev.post-deploy.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/spopulin/gh-actions-playground/issues"
+  },
+  "homepage": "https://github.com/spopulin/gh-actions-playground#readme"
+}
