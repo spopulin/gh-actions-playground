@@ -34,4 +34,4 @@ jobs:
       - name: copied var
         run: echo $COPIED_VAR
         env:
-          COPIED_VAR: $STAGE
+          COPIED_VAR: ${{ env.STAGE }}
