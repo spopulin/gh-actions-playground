@@ -1,12 +1,6 @@
 name: deploy to dev environment
 
-on:
-  push:
-    branches:
-      - main
-      - staging
-      - prod
-  workflow_dispatch: # manual trigger
+on: push
 
 env:
   STAGE: ${{ github.ref_name == 'main' && 'dev' || github.ref_name }}
@@ -36,3 +30,8 @@ jobs:
         run: echo $ENV_VAR
         env:
           ENV_VAR: ${{ vars.EXP_VALUE }}
+
+      - name: copied var
+        run: echo $COPIED_VAR
+        env:
+          COPIED_VAR: $STAGE
