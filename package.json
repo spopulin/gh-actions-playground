@@ -1,6 +1,6 @@
 {
   "name": "gh-actions-playground",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Public repository created to test github actions features (for free 😛)",
   "main": "bump-version.js",
   "scripts": {
