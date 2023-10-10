@@ -22,5 +22,5 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: run script
-        run: git log
+        run: git log --pretty=format:"%h %s" 
         
