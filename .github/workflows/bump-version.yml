@@ -7,7 +7,7 @@ on:
   workflow_dispatch: # manual trigger
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   update_workflow:
