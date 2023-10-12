@@ -118,8 +118,8 @@ jobs:
       - name: echo service name
         run: echo config sync
 
-  spot-notification-dev:
-    name: spot notification dev
+  notification-dev:
+    name: notifications dev
     needs: [bump-version]
     runs-on: ubuntu-latest
     if: github.ref_name == 'main' # only run in main branch (dev)
@@ -144,8 +144,8 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-  spot-notification-staging:
-    name: spot notification staging
+  notification-staging:
+    name: notifications staging
     needs: [migrations, config-sync]
     runs-on: ubuntu-latest
     if: github.ref_name == 'staging' # only run in staging
@@ -170,8 +170,8 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
-  spot-notification-prod:
-    name: spot notification staging
+  notification-prod:
+    name: notifications prod
     needs: [create-release]
     runs-on: ubuntu-latest
     if: github.ref_name == 'prod' # only run in prod
