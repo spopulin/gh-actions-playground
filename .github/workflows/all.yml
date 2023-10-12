@@ -11,6 +11,7 @@ on:
 env:
   DEPLOY_STAGE: ${{ github.ref_name == 'prod' && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
   NODE_OPTIONS: "--max-old-space-size=5120" # 5GB
+  SLACK_MESSAGE_PAYLOAD_PATH: "./slack-message.json"
 
 # service names defined in strategy.matrix must match the directory name (under ./services) in which the service (with its serverless.yml) is located
 
@@ -125,7 +126,7 @@ jobs:
     steps:
       - name: "Create slack message payload"
         run: |
-          echo "{\"environment\": \"$ENVIRONMENT\", \"branch\": \"$BRANCH\", \"commit\": \"$COMMIT\", \"deploymentType\": \"$DEPLOYMENT_TYPE\", \"services\": \"$SERVICES\"}" > slack-message.json
+          echo "{\"environment\": \"$ENVIRONMENT\", \"branch\": \"$BRANCH\", \"commit\": \"$COMMIT\", \"deploymentType\": \"$DEPLOYMENT_TYPE\", \"services\": \"$SERVICES\"}" > $SLACK_MESSAGE_PAYLOAD_PATH
         env:
           ENVIRONMENT: ${{ env.DEPLOY_STAGE }}
           BRANCH: ${{ github.ref_name }}
@@ -192,6 +193,6 @@ jobs:
       - name: Notify Slack
         uses: slackapi/slack-github-action@v1.24.0
         with:
-          payload-file-path: "./payload-slack-content.json"
+          payload-file-path: ${{ env.SLACK_MESSAGE_PAYLOAD_PATH }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}GITHUB_EVENT_NAME
