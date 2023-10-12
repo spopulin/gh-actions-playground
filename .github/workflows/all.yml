@@ -132,7 +132,7 @@ jobs:
             "environment": "${{ env.DEPLOY_STAGE }}",
             "branch": "${{ github.ref_name }}",
             "commit": "${{ github.sha }}",
-            "deploymentType": "${{ github.event_name == ''workflow_dispatch'' && ''manual'' || github.event_name == ''push'' && ''automatic'' || github.event_name }}",
+            "deploymentType": "${{ github.event_name == 'workflow_dispatch' && 'manual' || github.event_name == 'push' && 'automatic' || github.event_name }}",
             "services": "all"
           }' > slack-message-payload.json
         env:
