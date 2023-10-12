@@ -11,7 +11,7 @@ on:
 env:
   DEPLOY_STAGE: ${{ github.ref_name == 'prod' && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
   NODE_OPTIONS: "--max-old-space-size=5120" # 5GB
-  SLACK_MESSAGE_PAYLOAD_PATH: "./slack-message.json"
+  SLACK_MESSAGE_PAYLOAD_PATH: "./slack-message-payload.json"
 
 # service names defined in strategy.matrix must match the directory name (under ./services) in which the service (with its serverless.yml) is located
 
@@ -124,26 +124,24 @@ jobs:
     needs: [deploy-second-phase]
     runs-on: ubuntu-latest
     steps:
-      - name: "Create slack message payload"
-        # run: |
-        #   echo "{\"environment\": \"$ENVIRONMENT\", \"branch\": \"$BRANCH\", \"commit\": \"$COMMIT\", \"deploymentType\": \"$DEPLOYMENT_TYPE\", \"services\": \"$SERVICES\"}" > $SLACK_MESSAGE_PAYLOAD_PATH
+      - name: Create slack message payload
         run: |
           echo '{
             "environment": "${{ env.ENVIRONMENT }}",
             "branch":"${{ env.BRANCH }}",
             "commit": "${{ env.COMMIT }}",
-            "deploymentType": ""${{ env.DEPLOYMENT_TYPE }}"",
-            "services": "${{ env.SEVICES }}"
-          }' > slack-message-payload.json
+            "deploymentType": "${{ env.DEPLOYMENT_TYPE }}",
+            "services": "${{ env.SERVICES }}"
+          }' > $SLACK_MESSAGE_PAYLOAD_PATH
         env:
           ENVIRONMENT: ${{ env.DEPLOY_STAGE }}
           BRANCH: ${{ github.ref_name }}
           COMMIT: ${{ github.sha }}
           DEPLOYMENT_TYPE: ${{ github.event_name == 'workflow_dispatch' && 'manual' || github.event_name == 'push' && 'automatic' || github.event_name }}
           SERVICES: all
-      - name: "Print slack message payload"
+      - name: Print slack message payload
         run: |
-          cat slack-message-payload.json
+          cat $SLACK_MESSAGE_PAYLOAD_PATH
 
   notification-dev:
     name: notifications dev
@@ -206,4 +204,4 @@ jobs:
         with:
           payload-file-path: ${{ env.SLACK_MESSAGE_PAYLOAD_PATH }}
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}GITHUB_EVENT_NAME
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
