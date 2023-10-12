@@ -10,7 +10,7 @@ on:
 
 env:
   DEPLOY_STAGE: ${{ github.ref_name == 'prod' && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
-  NODE_OPTIONS: '--max-old-space-size=5120' # 5GB
+  NODE_OPTIONS: "--max-old-space-size=5120" # 5GB
 
 # service names defined in strategy.matrix must match the directory name (under ./services) in which the service (with its serverless.yml) is located
 
@@ -117,7 +117,7 @@ jobs:
     steps:
       - name: echo service name
         run: echo config sync
-  
+
   spot-notification-dev:
     name: spot notification dev
     needs: [bump-version]
@@ -132,7 +132,7 @@ jobs:
     steps:
       - name: echo service name
         run: echo config sync
-  
+
   spot-notification-staging:
     name: spot notification staging
     needs: [migrations, config-sync]
@@ -147,7 +147,7 @@ jobs:
     steps:
       - name: echo service name
         run: echo config sync
-  
+
   spot-notification-prod:
     name: spot notification staging
     needs: [create-release]
@@ -162,9 +162,11 @@ jobs:
     steps:
       - name: echo service name
         run: echo config sync
-  
+
   slack-notification:
     name: Notify Deployment Completion
+    runs-on: ubuntu-latest
+    needs: [spot-notification-dev]
     steps:
       - name: Notify Slack
         uses: slackapi/slack-github-action@v1.24.0
