@@ -123,8 +123,15 @@ jobs:
     needs: [deploy-second-phase]
     runs-on: ubuntu-latest
     steps:
+      name: "Create slack message payload"
       run: |
-      echo '{"environment": "${{ env.DEPLOY_STAGE }}", "branch": "${{ github.ref_name }}", "commit": "${{ github.sha }}", "deploymentType": "${{ github.event_name == "workflow_dispatch" && "manual" || github.event_name == "push" && "automatic" || github.event_name }}", "services": "all"}' > slack-message.json
+        echo "{\"environment\": \"$ENVIRONMENT\", \"branch\": \"$BRANCH\", \"commit\": \"$COMMIT\", \"deploymentType\": \"$DEPLOYMENT_TYPE\", \"services\": \"$SERVICES\"}" > slack-message.json
+      env:
+        ENVIRONMENT: ${{ env.DEPLOY_STAGE }}
+        BRANCH: ${{ github.ref_name }}
+        COMMIT: ${{ github.sha }}
+        DEPLOYMENT_TYPE: ${{ github.event_name == 'workflow_dispatch' && 'manual' || github.event_name == 'push' && 'automatic' || github.event_name }}
+        SERVICES: all
 
   notification-dev:
     name: notifications dev
