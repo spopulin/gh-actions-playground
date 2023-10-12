@@ -1,0 +1,179 @@
+name: deploy all services
+
+on:
+  push:
+    branches: # autodeploy
+      - main
+      - staging
+      - prod
+  workflow_dispatch: # manual trigger
+
+env:
+  DEPLOY_STAGE: ${{ github.ref_name == 'prod' && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
+  NODE_OPTIONS: '--max-old-space-size=5120' # 5GB
+
+# service names defined in strategy.matrix must match the directory name (under ./services) in which the service (with its serverless.yml) is located
+
+jobs:
+  deploy-first-phase:
+    name: ${{ matrix.service }} deploy
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'prod' && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
+    strategy:
+      matrix:
+        node-version: [16.15.0]
+        service:
+          - "service-base-1"
+          - "service-base-2"
+          - "service-base-3"
+    steps:
+      - name: echo service name
+        run: echo ${{ matrix.service }}
+      - name: echo environment name
+        run: echo ${{ env.ENV_NAME }}
+      - name: echo branch name
+        run: echo ${{ github.ref_name }}
+
+  deploy-second-phase:
+    name: ${{ matrix.service }} deploy
+    needs: deploy-first-phase
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'prod' && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
+    strategy:
+      matrix:
+        node-version: [16.15.0]
+        service:
+          - "service-one"
+          - "service-two"
+          - "service-three"
+          - "service-four"
+    steps:
+      - name: echo service name
+        run: echo ${{ matrix.service }}
+      - name: echo environment name
+        run: echo ${{ env.ENV_NAME }}
+      - name: echo branch name
+        run: echo ${{ github.ref_name }}
+
+  migrations:
+    name: Execute migrations
+    needs: [deploy-second-phase]
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'prod' && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
+    strategy:
+      matrix:
+        node-version: [16.15.0]
+    steps:
+      - name: echo service name
+        run: echo migrations
+
+  config-sync:
+    name: Config sync
+    needs: [deploy-second-phase]
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'prod' && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
+    strategy:
+      matrix:
+        node-version: [16.15.0]
+    steps:
+      - name: echo service name
+        run: echo config sync
+
+  bump-version:
+    name: Bump node package version
+    needs: [migrations, config-sync]
+    runs-on: ubuntu-latest
+    if: github.ref_name == 'main' # only run in main branch (dev)
+    environment: dev # use always dev
+    strategy:
+      matrix:
+        node-version: [16.15.0]
+    steps:
+      - name: echo service name
+        run: echo config sync
+
+  tag-version:
+    name: Tag version to be released
+    needs: [migrations, config-sync]
+    runs-on: ubuntu-latest
+    if: github.ref_name == 'prod' # only prod
+    environment: prod # use always prod
+    strategy:
+      matrix:
+        node-version: [16.15.0]
+    steps:
+      - name: echo service name
+        run: echo config sync
+
+  create-release:
+    name: Create Release
+    needs: [tag-version]
+    runs-on: ubuntu-latest
+    if: github.ref_name == 'prod' # only prod
+    environment: prod # use always prod
+    strategy:
+      matrix:
+        node-version: [16.15.0]
+    steps:
+      - name: echo service name
+        run: echo config sync
+  
+  spot-notification-dev:
+    name: spot notification dev
+    needs: [bump-version]
+    runs-on: ubuntu-latest
+    if: github.ref_name == 'main' # only run in main branch (dev)
+    environment: dev # use always dev
+    permissions:
+      contents: write
+    strategy:
+      matrix:
+        node-version: [16.15.0]
+    steps:
+      - name: echo service name
+        run: echo config sync
+  
+  spot-notification-staging:
+    name: spot notification staging
+    needs: [migrations, config-sync]
+    runs-on: ubuntu-latest
+    if: github.ref_name == 'staging' # only run in staging
+    environment: staging # use always staging
+    permissions:
+      contents: write
+    strategy:
+      matrix:
+        node-version: [16.15.0]
+    steps:
+      - name: echo service name
+        run: echo config sync
+  
+  spot-notification-prod:
+    name: spot notification staging
+    needs: [create-release]
+    runs-on: ubuntu-latest
+    if: github.ref_name == 'prod' # only run in prod
+    environment: prod # use always prod
+    permissions:
+      contents: write
+    strategy:
+      matrix:
+        node-version: [16.15.0]
+    steps:
+      - name: echo service name
+        run: echo config sync
+  
+  slack-notification:
+    name: Notify Deployment Completion
+    steps:
+      - name: Notify Slack
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "environment": ${{ env.DEPLOY_STAGE }},
+              "branch": ${{ github.ref_name }},
+              "commit": ${{ github.sha }}
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
