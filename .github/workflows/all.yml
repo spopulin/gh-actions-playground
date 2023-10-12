@@ -192,6 +192,8 @@ jobs:
               "environment": "${{ env.DEPLOY_STAGE }}",
               "branch": "${{ github.ref_name }}",
               "commit": "${{ github.sha }}"
+              "deploymentType": "${{ github.event_name == 'workflow_dispatch' && 'manual' || github.event_name == 'push' && 'automatic' || github.event_name }}",
+              "services": "all"
             }
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}GITHUB_EVENT_NAME
