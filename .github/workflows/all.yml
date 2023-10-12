@@ -129,11 +129,11 @@ jobs:
         #   echo "{\"environment\": \"$ENVIRONMENT\", \"branch\": \"$BRANCH\", \"commit\": \"$COMMIT\", \"deploymentType\": \"$DEPLOYMENT_TYPE\", \"services\": \"$SERVICES\"}" > $SLACK_MESSAGE_PAYLOAD_PATH
         run: |
           echo '{
-            "environment": "${{ env.DEPLOY_STAGE }}",
-            "branch": "${{ github.ref_name }}",
-            "commit": "${{ github.sha }}",
-            "deploymentType": "${{ github.event_name == 'workflow_dispatch' && 'manual' || github.event_name == 'push' && 'automatic' || github.event_name }}",
-            "services": "all"
+            "environment": "$ENVIRONMENT",
+            "branch": "$BRANCH",
+            "commit": "$COMMIT }}",
+            "deploymentType": "$DEPLOYMENT_TYPE",
+            "services": "$SERVICES"
           }' > slack-message-payload.json
         env:
           ENVIRONMENT: ${{ env.DEPLOY_STAGE }}
