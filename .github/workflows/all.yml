@@ -173,9 +173,9 @@ jobs:
         with:
           payload: |
             {
-              "environment": ${{ env.DEPLOY_STAGE }},
-              "branch": ${{ github.ref_name }},
-              "commit": ${{ github.sha }}
+              "environment": "${{ env.DEPLOY_STAGE }}",
+              "branch": "${{ github.ref_name }}",
+              "commit": "${{ github.sha }}"
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
