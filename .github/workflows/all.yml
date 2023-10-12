@@ -118,18 +118,17 @@ jobs:
       - name: echo service name
         run: echo config sync
 
-    summarize-deployment-info:
+  summarize-deployment-info:
     name: notifications dev
     needs: [deploy-second-phase]
     runs-on: ubuntu-latest
     steps:
-      run: | 
-      echo '
-        {
+      run: |
+        echo '{
           "environment": "${{ env.DEPLOY_STAGE }}",
           "branch": "${{ github.ref_name }}",
           "commit": "${{ github.sha }}",
-          "deploymentType": "${{ github.event_name == 'workflow_dispatch' && 'manual' || github.event_name == 'push' && 'automatic' || github.event_name }}",
+          "deploymentType": "${{ github.event_name == ''workflow_dispatch'' && ''manual'' || github.event_name == ''push'' && ''automatic'' || github.event_name }}",
           "services": "all"
         }' > slack-message.json
 
