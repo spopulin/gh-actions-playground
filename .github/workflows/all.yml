@@ -151,7 +151,7 @@ jobs:
       - name: Notify Slack
         uses: slackapi/slack-github-action@v1.24.0
         with:
-          payload-file-path: "./payload-slack-content.json"
+          payload-file-path: ${{ env.SLACK_MESSAGE_PAYLOAD_PATH }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
@@ -172,7 +172,7 @@ jobs:
       - name: Notify Slack
         uses: slackapi/slack-github-action@v1.24.0
         with:
-          payload-file-path: "./payload-slack-content.json"
+          payload-file-path: ${{ env.SLACK_MESSAGE_PAYLOAD_PATH }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
