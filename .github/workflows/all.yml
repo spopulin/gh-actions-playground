@@ -125,14 +125,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "Create slack message payload"
+        # run: |
+        #   echo "{\"environment\": \"$ENVIRONMENT\", \"branch\": \"$BRANCH\", \"commit\": \"$COMMIT\", \"deploymentType\": \"$DEPLOYMENT_TYPE\", \"services\": \"$SERVICES\"}" > $SLACK_MESSAGE_PAYLOAD_PATH
         run: |
-          echo "{\"environment\": \"$ENVIRONMENT\", \"branch\": \"$BRANCH\", \"commit\": \"$COMMIT\", \"deploymentType\": \"$DEPLOYMENT_TYPE\", \"services\": \"$SERVICES\"}" > $SLACK_MESSAGE_PAYLOAD_PATH
+          echo '{
+            "environment": "${{ env.DEPLOY_STAGE }}",
+            "branch": "${{ github.ref_name }}",
+            "commit": "${{ github.sha }}",
+            "deploymentType": "${{ github.event_name == ''workflow_dispatch'' && ''manual'' || github.event_name == ''push'' && ''automatic'' || github.event_name }}",
+            "services": "all"
+          }' > slack-message-payload.json
         env:
           ENVIRONMENT: ${{ env.DEPLOY_STAGE }}
           BRANCH: ${{ github.ref_name }}
           COMMIT: ${{ github.sha }}
           DEPLOYMENT_TYPE: ${{ github.event_name == 'workflow_dispatch' && 'manual' || github.event_name == 'push' && 'automatic' || github.event_name }}
           SERVICES: all
+      - name: "Print slack message payload"
+        run: |
+          cat slack-message-payload.json
 
   notification-dev:
     name: notifications dev
