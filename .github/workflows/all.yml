@@ -118,6 +118,21 @@ jobs:
       - name: echo service name
         run: echo config sync
 
+    summarize-deployment-info:
+    name: notifications dev
+    needs: [deploy-second-phase]
+    runs-on: ubuntu-latest
+    steps:
+      run: | 
+      echo '
+        {
+          "environment": "${{ env.DEPLOY_STAGE }}",
+          "branch": "${{ github.ref_name }}",
+          "commit": "${{ github.sha }}",
+          "deploymentType": "${{ github.event_name == 'workflow_dispatch' && 'manual' || github.event_name == 'push' && 'automatic' || github.event_name }}",
+          "services": "all"
+        }' > slack-message.json
+
   notification-dev:
     name: notifications dev
     needs: [bump-version]
@@ -135,12 +150,7 @@ jobs:
       - name: Notify Slack
         uses: slackapi/slack-github-action@v1.24.0
         with:
-          payload: |
-            {
-              "environment": "${{ env.DEPLOY_STAGE }}",
-              "branch": "${{ github.ref_name }}",
-              "commit": "${{ github.sha }}"
-            }
+          payload-file-path: "./payload-slack-content.json"
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
@@ -161,12 +171,7 @@ jobs:
       - name: Notify Slack
         uses: slackapi/slack-github-action@v1.24.0
         with:
-          payload: |
-            {
-              "environment": "${{ env.DEPLOY_STAGE }}",
-              "branch": "${{ github.ref_name }}",
-              "commit": "${{ github.sha }}"
-            }
+          payload-file-path: "./payload-slack-content.json"
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
@@ -187,13 +192,6 @@ jobs:
       - name: Notify Slack
         uses: slackapi/slack-github-action@v1.24.0
         with:
-          payload: |
-            {
-              "environment": "${{ env.DEPLOY_STAGE }}",
-              "branch": "${{ github.ref_name }}",
-              "commit": "${{ github.sha }}"
-              "deploymentType": "${{ github.event_name == 'workflow_dispatch' && 'manual' || github.event_name == 'push' && 'automatic' || github.event_name }}",
-              "services": "all"
-            }
+          payload-file-path: "./payload-slack-content.json"
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}GITHUB_EVENT_NAME
