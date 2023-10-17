@@ -11,7 +11,8 @@ on:
 env:
   DEPLOY_STAGE: ${{ github.ref_name == 'prod' && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
   NODE_OPTIONS: "--max-old-space-size=5120" # 5GB
-  SLACK_MESSAGE_PAYLOAD_PATH: "./slack-message-payload.json"
+  SLACK_MESSAGE_PAYLOAD_ARTIFACT_NAME: "slack-message-payload"
+  SLACK_MESSAGE_PAYLOAD_PATH: "slack-message-payload.json"
 
 # service names defined in strategy.matrix must match the directory name (under ./services) in which the service (with its serverless.yml) is located
 
@@ -119,7 +120,7 @@ jobs:
       - name: echo service name
         run: echo config sync
 
-  summarize-deployment-info:
+  upload-summarized-deployment-info:
     name: notifications dev
     needs: [deploy-second-phase]
     runs-on: ubuntu-latest
@@ -139,9 +140,13 @@ jobs:
           COMMIT: ${{ github.sha }}
           DEPLOYMENT_TYPE: ${{ github.event_name == 'workflow_dispatch' && 'manual' || github.event_name == 'push' && 'automatic' || github.event_name }}
           SERVICES: all
-      - name: Print slack message payload
-        run: |
-          cat $SLACK_MESSAGE_PAYLOAD_PATH
+      - run: cat $SLACK_MESSAGE_PAYLOAD_PATH
+      - name: Store file as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.SLACK_MESSAGE_PAYLOAD_ARTIFACT_NAME }}
+          path: ${{ env.SLACK_MESSAGE_PAYLOAD_PATH }}
+          retention-days: 7
 
   notification-dev:
     name: notifications dev
@@ -155,8 +160,14 @@ jobs:
       matrix:
         node-version: [16.15.0]
     steps:
+      - name: Download slack-message-payload artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ env.SLACK_MESSAGE_PAYLOAD_ARTIFACT_NAME }}
       - name: echo service name
         run: echo config sync
+      - name: cat file
+        run: cat ${{ env.SLACK_MESSAGE_PAYLOAD_PATH }}
       - name: Notify Slack
         uses: slackapi/slack-github-action@v1.24.0
         with:
