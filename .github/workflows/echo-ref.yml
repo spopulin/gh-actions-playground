@@ -1,0 +1,22 @@
+
+name: test ref
+
+on:
+  push:
+    branches: # autodeploy 
+      - main
+      - staging
+      - prod
+  workflow_dispatch: # manual trigger
+
+jobs:
+  deploy-first-phase:
+    name: echo ref
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'prod' && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
+    strategy:
+      matrix:
+        node-version: [16.15.0]
+    steps:
+      - name: echo service name
+        run: echo ${{ github.ref }}
