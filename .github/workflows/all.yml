@@ -9,7 +9,7 @@ on:
   workflow_dispatch: # manual trigger
 
 env:
-  DEPLOY_STAGE: ${{ (github.ref_name == 'prod' || github.ref_type == 'tag') || github.ref_name == 'staging' && 'staging' || 'dev' }}
+  DEPLOY_STAGE: ${{ (github.ref_name == 'prod' || github.ref_type == 'tag') && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
   NODE_OPTIONS: "--max-old-space-size=5120" # 5GB
   SLACK_MESSAGE_PAYLOAD_ARTIFACT_NAME: "slack-message-payload"
   SLACK_MESSAGE_PAYLOAD_PATH: "slack-message-payload.json"
@@ -230,7 +230,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
   notification-rollback:
-    name: notifications prod
+    name: notifications rollback
     needs: [upload-summarized-deployment-info]
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch' && github.ref_type == 'tag' # only run when is a rollback
