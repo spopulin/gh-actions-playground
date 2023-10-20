@@ -9,7 +9,7 @@ on:
   workflow_dispatch: # manual trigger
 
 env:
-  DEPLOY_STAGE: ${{ github.ref_name == 'prod' && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
+  DEPLOY_STAGE: ${{ (github.ref_name == 'prod' || github.ref_type == 'tag') || github.ref_name == 'staging' && 'staging' || 'dev' }}
   NODE_OPTIONS: "--max-old-space-size=5120" # 5GB
   SLACK_MESSAGE_PAYLOAD_ARTIFACT_NAME: "slack-message-payload"
   SLACK_MESSAGE_PAYLOAD_PATH: "slack-message-payload.json"
@@ -20,7 +20,7 @@ jobs:
   deploy-first-phase:
     name: ${{ matrix.service }} deploy
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name == 'prod' && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
+    environment: ${{ (github.ref_name == 'prod' || github.ref_type == 'tag') && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
     strategy:
       matrix:
         node-version: [16.15.0]
@@ -40,7 +40,7 @@ jobs:
     name: ${{ matrix.service }} deploy
     needs: deploy-first-phase
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name == 'prod' && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
+    environment: ${{ (github.ref_name == 'prod' || github.ref_type == 'tag') && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
     strategy:
       matrix:
         node-version: [16.15.0]
@@ -61,7 +61,7 @@ jobs:
     name: Execute migrations
     needs: [deploy-second-phase]
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name == 'prod' && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
+    environment: ${{ (github.ref_name == 'prod' || github.ref_type == 'tag') || github.ref_name == 'staging' && 'staging' || 'dev' }}
     strategy:
       matrix:
         node-version: [16.15.0]
@@ -73,7 +73,7 @@ jobs:
     name: Config sync
     needs: [deploy-second-phase]
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name == 'prod' && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
+    environment: ${{ (github.ref_name == 'prod' || github.ref_type == 'tag') && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
     strategy:
       matrix:
         node-version: [16.15.0]
@@ -136,9 +136,9 @@ jobs:
           }' > $SLACK_MESSAGE_PAYLOAD_PATH
         env:
           ENVIRONMENT: ${{ env.DEPLOY_STAGE }}
-          BRANCH: ${{ github.ref_name }}
+          BRANCH: ${{ github.ref_name }}  (github.ref_name == 'prod' || github.ref_type == 'tag')
           COMMIT: ${{ github.sha }}
-          DEPLOYMENT_TYPE: ${{ github.event_name == 'workflow_dispatch' && 'manual' || github.event_name == 'push' && 'automatic' || github.event_name }}
+          DEPLOYMENT_TYPE: ${{ github.event_name == 'workflow_dispatch' && 'manual' || github.event_name == 'push' && 'automatic' || github.event_name == 'workflow_dispatch' && github.ref_type == 'tag' && 'manual rollback' || github.event_name }}
           SERVICES: all
       - run: cat $SLACK_MESSAGE_PAYLOAD_PATH
       - name: Store file as artifact
