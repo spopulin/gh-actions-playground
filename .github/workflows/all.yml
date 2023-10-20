@@ -231,7 +231,7 @@ jobs:
 
   notification-rollback:
     name: notifications rollback
-    needs: [upload-summarized-deployment-info]
+    needs: [migrations, config-sync, upload-summarized-deployment-info]
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch' && github.ref_type == 'tag' # only run when is a rollback
     environment: prod # use always prod
