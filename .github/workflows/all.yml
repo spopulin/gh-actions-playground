@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ (github.ref_name == 'prod' || github.ref_type == 'tag') && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
     concurrency:
-      group: ${{ github.ref }}-${{ github.job }}
+      group: ${{ github.ref }}-${{ github.job }}-${{ matrix.service }}
       cancel-in-progress: true
     strategy:
       matrix:
@@ -38,7 +38,8 @@ jobs:
         run: echo ${{ env.ENV_NAME }}
       - name: echo branch name
         run: echo ${{ github.ref_name }}
-      - run: echo ${{ github.ref }}-${{ github.job }}
+      - name: echo concurrency group
+        run: echo ${{ github.ref }}-${{ github.job }}-${{ matrix.service }}
 
   deploy-second-phase:
     name: ${{ matrix.service }} deploy
@@ -62,8 +63,8 @@ jobs:
       - name: echo environment name
         run: echo ${{ env.ENV_NAME }}
       - name: echo branch name
-        run: echo ${{ github.ref_name }}
-      - run: echo ${{ github.ref }}-${{ github.job }}
+      - name: echo concurrency group
+        run: echo ${{ github.ref }}-${{ github.job }}-${{ matrix.service }}
 
   migrations:
     name: Execute migrations
