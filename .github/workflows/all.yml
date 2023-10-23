@@ -38,6 +38,7 @@ jobs:
         run: echo ${{ env.ENV_NAME }}
       - name: echo branch name
         run: echo ${{ github.ref_name }}
+      - run: echo ${{ github.ref }}-${{ github.job }}
 
   deploy-second-phase:
     name: ${{ matrix.service }} deploy
@@ -62,6 +63,7 @@ jobs:
         run: echo ${{ env.ENV_NAME }}
       - name: echo branch name
         run: echo ${{ github.ref_name }}
+      - run: echo ${{ github.ref }}-${{ github.job }}
 
   migrations:
     name: Execute migrations
