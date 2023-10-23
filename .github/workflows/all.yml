@@ -21,6 +21,9 @@ jobs:
     name: ${{ matrix.service }} deploy
     runs-on: ubuntu-latest
     environment: ${{ (github.ref_name == 'prod' || github.ref_type == 'tag') && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
+    concurrency:
+      group: ${{ github.ref }}
+      cancel-in-progress: true
     strategy:
       matrix:
         node-version: [16.15.0]
@@ -41,6 +44,9 @@ jobs:
     needs: deploy-first-phase
     runs-on: ubuntu-latest
     environment: ${{ (github.ref_name == 'prod' || github.ref_type == 'tag') && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
+    concurrency:
+      group: ${{ github.ref }}
+      cancel-in-progress: true
     strategy:
       matrix:
         node-version: [16.15.0]
