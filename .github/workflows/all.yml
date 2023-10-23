@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ (github.ref_name == 'prod' || github.ref_type == 'tag') && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
     concurrency:
-      group: ${{ github.ref }}
+      group: ${{ github.ref }}-${{ github.job }}
       cancel-in-progress: true
     strategy:
       matrix:
@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ (github.ref_name == 'prod' || github.ref_type == 'tag') && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
     concurrency:
-      group: ${{ github.ref }}
+      group: ${{ github.ref }}-${{ github.job }}
       cancel-in-progress: true
     strategy:
       matrix:
