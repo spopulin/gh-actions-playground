@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ (github.ref_name == 'prod' || github.ref_type == 'tag') && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
     concurrency:
-      group: ${{ github.ref }}-${{ github.job }}-${{ matrix.service }}
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ github.job }}-${{ matrix.service }}
     strategy:
       matrix:
         node-version: [16.15.0]
@@ -45,7 +45,7 @@ jobs:
       - name: echo branch name
         run: echo ${{ github.ref_name }}
       - name: echo concurrency group
-        run: echo ${{ github.ref }}-${{ github.job }}-${{ matrix.service }}
+        run: echo ${{ github.workflow }}-${{ github.ref }}-${{ github.job }}-${{ matrix.service }}
       - name: run mock async func
         run: npm run mock-func
 
@@ -55,7 +55,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ (github.ref_name == 'prod' || github.ref_type == 'tag') && 'prod' || github.ref_name == 'staging' && 'staging' || 'dev' }}
     concurrency:
-      group: ${{ github.ref }}-${{ github.job }}-${{ matrix.service }}
+      group: ${{ github.workflow }}-${{ github.ref }}-${{ github.job }}-${{ matrix.service }}
+      cancel-in-progress: true
     strategy:
       matrix:
         node-version: [16.15.0]
@@ -77,7 +78,7 @@ jobs:
       - name: echo environment name
         run: echo ${{ env.ENV_NAME }}
       - name: echo concurrency group
-        run: echo ${{ github.ref }}-${{ github.job }}-${{ matrix.service }}
+        run: echo ${{ github.workflow }}-${{ github.ref }}-${{ github.job }}-${{ matrix.service }}
       - name: run mock async function
         run: npm run mock-func
 
