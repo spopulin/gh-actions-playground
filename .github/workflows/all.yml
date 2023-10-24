@@ -32,6 +32,13 @@ jobs:
           - "service-base-2"
           - "service-base-3"
     steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
       - name: echo service name
         run: echo ${{ matrix.service }}
       - name: echo environment name
@@ -60,6 +67,13 @@ jobs:
           - "service-three"
           - "service-four"
     steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
       - name: echo service name
         run: echo ${{ matrix.service }}
       - name: echo environment name
