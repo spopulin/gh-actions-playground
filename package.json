@@ -5,7 +5,8 @@
   "main": "bump-version.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "post-deploy": "node ./dev.post-deploy.js"
+    "post-deploy": "node ./dev.post-deploy.js",
+    "mock-func": "node scripts/mock-async-func.js"
   },
   "repository": {
     "type": "git",

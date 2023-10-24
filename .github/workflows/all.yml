@@ -40,6 +40,8 @@ jobs:
         run: echo ${{ github.ref_name }}
       - name: echo concurrency group
         run: echo ${{ github.ref }}-${{ github.job }}-${{ matrix.service }}
+      - name: run mock async func
+        run: npm run mock-func
 
   deploy-second-phase:
     name: ${{ matrix.service }} deploy
@@ -64,6 +66,8 @@ jobs:
         run: echo ${{ env.ENV_NAME }}
       - name: echo concurrency group
         run: echo ${{ github.ref }}-${{ github.job }}-${{ matrix.service }}
+      - name: run mock async func
+        run: npm run mock-func
 
   migrations:
     name: Execute migrations
